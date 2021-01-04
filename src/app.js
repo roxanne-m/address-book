@@ -15,6 +15,7 @@ const morganOption = NODE_ENV === 'production' ? 'tiny' : 'common';
 app.use(morgan(morganOption));
 app.use(helmet());
 app.use(cors());
+app.use(express.json());
 
 const address = [
   {
@@ -94,8 +95,25 @@ app.post('/address', (req, res) => {
 
   address.push(newContact);
 
-  res.status(201).location(`http://localhost:8000/address/${id}`).json({id: id});
+  res.status(201);
   res.send('All validations passed.');
+});
+
+
+// DELETE REQUEST
+app.delete('/address/:id', (req, res) =>{
+  const { id } = req.params;
+
+  const index = address.findIndex(a => a.id === id);
+
+  // make sure we actually find a user with that id
+  if(index === -1){
+    return res.status(404).send('Contact not found.');
+  }
+
+  address.splice(index, 1);
+
+  res.status(204).end();
 });
 
 app.use(function errorHandler(error, req, res, next) {
